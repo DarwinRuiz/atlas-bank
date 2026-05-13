@@ -1,6 +1,7 @@
 package com.darwinruiz.atlas_bank.accounts.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,37 +12,50 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.darwinruiz.atlas_bank.accounts.dtos.AccountResponse;
+import com.darwinruiz.atlas_bank.accounts.dtos.CreateAccountRequest;
+import com.darwinruiz.atlas_bank.accounts.dtos.IAccountMapper;
 import com.darwinruiz.atlas_bank.accounts.models.Account;
 import com.darwinruiz.atlas_bank.accounts.services.IAccountService;
-import com.darwinruiz.atlas_bank.transactions.services.ITransactionQueryService;
-import com.darwinruiz.atlas_bank.transactions.services.ITransferService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountController {
     private final IAccountService accountService;
+    private final IAccountMapper accountMapper;
 
-    public AccountController(IAccountService accountService, ITransferService transferService,
-            ITransactionQueryService transactionQueryService) {
+    public AccountController(IAccountService accountService, IAccountMapper accountMapper) {
         this.accountService = accountService;
+        this.accountMapper = accountMapper;
     }
 
     @PostMapping
-    public ResponseEntity<Account> create(@RequestBody Account account) {
+    public ResponseEntity<AccountResponse> create(@Valid @RequestBody CreateAccountRequest createAccountRequest) {
+        Account account = this.accountMapper.toEntity(createAccountRequest);
+
         Account createdAccount = accountService.create(account);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
+        AccountResponse accountResponse = this.accountMapper.toResponse(createdAccount);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountResponse);
     }
 
     @GetMapping
-    public ResponseEntity<List<Account>> getAll() {
-        List<Account> accounts = accountService.getAll();
-        return ResponseEntity.ok(accounts);
+    public ResponseEntity<List<AccountResponse>> getAll() {
+        List<AccountResponse> accountResponses = accountService.getAll()
+                .stream()
+                .map(this.accountMapper::toResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(accountResponses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> getById(@PathVariable Long id) {
+    public ResponseEntity<AccountResponse> getById(@PathVariable Long id) {
         Account account = accountService.getById(id);
-        return ResponseEntity.ok(account);
+        AccountResponse accountResponse = this.accountMapper.toResponse(account);
+        return ResponseEntity.ok(accountResponse);
     }
 
 }

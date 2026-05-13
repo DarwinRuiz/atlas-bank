@@ -6,8 +6,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.darwinruiz.atlas_bank.accounts.exceptions.AccountNotFoundException;
 import com.darwinruiz.atlas_bank.accounts.models.Account;
 import com.darwinruiz.atlas_bank.accounts.repositories.IAccountRepository;
+import com.darwinruiz.atlas_bank.transactions.exceptions.AccountNotActiveException;
+import com.darwinruiz.atlas_bank.transactions.exceptions.InsufficientFundsException;
 import com.darwinruiz.atlas_bank.transactions.models.Transaction;
 import com.darwinruiz.atlas_bank.transactions.repositories.ITransactionRepository;
 import com.darwinruiz.atlas_bank.transactions.services.fee.IFeeCalculator;
@@ -30,21 +33,21 @@ public class TransferService implements ITransferService {
     public Transaction execute(Long fromId, Long toId, BigDecimal amount) {
         // Buscar cuentas
         Account from = accountRepository.findById(fromId)
-                .orElseThrow(() -> new RuntimeException("Cuenta origen no encontrada"));
+                .orElseThrow(() -> new AccountNotFoundException(fromId));
         Account to = accountRepository.findById(toId)
-                .orElseThrow(() -> new RuntimeException("Cuenta destino no encontrada"));
+                .orElseThrow(() -> new AccountNotFoundException(toId));
 
         // Validar que la cuenta esté activa
         if (!"ACTIVE".equals(from.getStatus())) {
-            throw new RuntimeException("La cuenta origen no está activa");
+            throw new AccountNotActiveException(fromId, from.getStatus());
         }
         if (!"ACTIVE".equals(to.getStatus())) {
-            throw new RuntimeException("La cuenta destino no está activa");
+            throw new AccountNotActiveException(toId, to.getStatus());
         }
 
         // Validar fondos
         if (from.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Fondos insuficientes");
+            throw new InsufficientFundsException(fromId, from.getBalance(), amount);
         }
 
         // Calcular comisión — hardcodeada
