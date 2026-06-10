@@ -32,11 +32,14 @@ public class Account {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false, length = 20)
     private String type;
+
+    @Column(nullable = false)
     private BigDecimal balance;
     private String status;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
