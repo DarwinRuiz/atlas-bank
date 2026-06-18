@@ -7,17 +7,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(1)
-public class CheckingFeeCalculator implements IFeeCalculator {
+public class PremiumFeeCalculator implements IFeeCalculator {
 
     @Override
     public Boolean supports(String accountType) {
-        return "CHECKING".equalsIgnoreCase(accountType);
+        return "PREMIUM".equals(accountType);
     }
 
     @Override
     public BigDecimal calculate(BigDecimal amount) {
-        // For example, let's say the fee is 1% of the amount
-        return amount.multiply(new BigDecimal("0.015"));
+        return BigDecimal.ZERO;
     }
 
 }

@@ -17,7 +17,7 @@ import com.darwinruiz.atlas_bank.transactions.dtos.TransactionResponse;
 import com.darwinruiz.atlas_bank.transactions.dtos.TransferRequest;
 import com.darwinruiz.atlas_bank.transactions.models.Transaction;
 import com.darwinruiz.atlas_bank.transactions.services.ITransactionQueryService;
-import com.darwinruiz.atlas_bank.transactions.services.ITransferService;
+import com.darwinruiz.atlas_bank.transactions.services.transfer.ITransferService;
 
 import jakarta.validation.Valid;
 
@@ -40,7 +40,8 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> transfer(@Valid @RequestBody TransferRequest transferRequest) {
         Transaction transaction = transferService.execute(transferRequest.getFromAccountId(),
                 transferRequest.getToAccountId(),
-                transferRequest.getAmount());
+                transferRequest.getAmount(),
+                transferRequest.getDescription());
 
         TransactionResponse transactionResponse = this.transactionMapper.toResponse(transaction);
 

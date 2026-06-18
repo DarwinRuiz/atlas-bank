@@ -40,6 +40,11 @@ public class Transaction {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "created_by")
+    private String createBy;
+
+    private String description;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
