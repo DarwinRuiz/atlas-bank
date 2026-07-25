@@ -3,6 +3,7 @@ package com.darwinruiz.atlas_bank.transaction.service.transfer;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.darwinruiz.atlas_bank.account.model.AccountStatus;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ public class TransferService extends TransactionProcesor<TransferContext> implem
     private final ApplicationEventPublisher eventPublisher;
 
     public TransferService(IAccountRepository accountRepository, ITransactionRepository transactionRepository,
-            List<IFeeCalculator> feeCalculators, ApplicationEventPublisher eventPublisher) {
+                           List<IFeeCalculator> feeCalculators, ApplicationEventPublisher eventPublisher) {
         super(transactionRepository);
         this.accountRepository = accountRepository;
         this.feeCalculators = feeCalculators;
@@ -43,7 +44,7 @@ public class TransferService extends TransactionProcesor<TransferContext> implem
 
         Transaction transaction = this.process(new TransferContext(from, to, amount, description));
 
-        eventPublisher.publishEvent(new TransactionExecutedEvent(transaction.getTransactionId(), transaction.getType(),
+        eventPublisher.publishEvent(new TransactionExecutedEvent(transaction.getTransactionId(), transaction.getType().name(),
                 transaction.getSourceAccountId(), transaction.getTargetAccountId(), transaction.getAmount(),
                 transaction.getFee()));
 
@@ -53,12 +54,12 @@ public class TransferService extends TransactionProcesor<TransferContext> implem
     @Override
     protected void validate(TransferContext context) {
         // Validar que la cuenta esté activa
-        if (!"ACTIVE".equals(context.fromAccount().getStatus())) {
+        if (context.fromAccount().getStatus() != AccountStatus.ACTIVE) {
             throw new AccountNotActiveException(context.fromAccount().getAccountId(),
-                    context.fromAccount().getStatus());
+                    context.fromAccount().getStatus().name());
         }
-        if (!"ACTIVE".equals(context.toAccount().getStatus())) {
-            throw new AccountNotActiveException(context.toAccount().getAccountId(), context.toAccount().getStatus());
+        if (context.toAccount().getStatus() != AccountStatus.ACTIVE) {
+            throw new AccountNotActiveException(context.toAccount().getAccountId(), context.toAccount().getStatus().name());
         }
 
         // Validar fondos

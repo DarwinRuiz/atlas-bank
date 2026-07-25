@@ -2,6 +2,7 @@ package com.darwinruiz.atlas_bank.transaction.service.fee;
 
 import java.math.BigDecimal;
 
+import com.darwinruiz.atlas_bank.account.model.AccountType;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class SavingsFeeCalculator implements IFeeCalculator {
 
     @Override
-    public Boolean supports(String accountType) {
-        return "SAVINGS".equalsIgnoreCase(accountType);
+    public Boolean supports(AccountType accountType) {
+        return accountType == AccountType.SAVING;
     }
 
     @Override

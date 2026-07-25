@@ -3,13 +3,7 @@ package com.darwinruiz.atlas_bank.transaction.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +17,8 @@ public class Transaction {
     @Column(name = "transaction_id")
     private Long transactionId;
 
-    private String type; // DEPOSIT, WITHDRAWAL, TRANSFER
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
 
     @Column(name = "source_account_id")
     private Long sourceAccountId;
@@ -35,7 +30,8 @@ public class Transaction {
 
     private BigDecimal fee;
 
-    private String status; // PENDING, EXECUTED, REJECTED
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -50,6 +46,6 @@ public class Transaction {
         this.createdAt = LocalDateTime.now();
 
         if (this.status == null)
-            this.status = "EXECUTED";
+            this.status = TransactionStatus.EXECUTED;
     }
 }

@@ -3,13 +3,7 @@ package com.darwinruiz.atlas_bank.account.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,11 +27,14 @@ public class Account {
     private String email;
 
     @Column(nullable = false, length = 20)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private AccountType type;
 
     @Column(nullable = false)
     private BigDecimal balance;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private AccountStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -47,7 +44,7 @@ public class Account {
         this.createdAt = LocalDateTime.now();
 
         if (this.status == null) {
-            this.status = "ACTIVE";
+            this.status = AccountStatus.ACTIVE;
         }
 
         if (this.balance == null) {

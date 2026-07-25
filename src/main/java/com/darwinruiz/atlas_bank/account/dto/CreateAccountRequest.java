@@ -2,8 +2,10 @@ package com.darwinruiz.atlas_bank.account.dto;
 
 import java.math.BigDecimal;
 
+import com.darwinruiz.atlas_bank.account.model.AccountType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,8 +25,8 @@ public class CreateAccountRequest {
     @Email(message = "Email should be valid")
     private String email;
 
-    @NotBlank(message = "Account type is required")
-    private String type;
+    @NotNull(message = "Account type is required")
+    private AccountType type;
 
     @PositiveOrZero(message = "Balance must be zero or positive")
     private BigDecimal balance;
